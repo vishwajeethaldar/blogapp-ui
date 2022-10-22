@@ -1,0 +1,1 @@
+export {default as matchPwd} from './auth/VerifyPwd'

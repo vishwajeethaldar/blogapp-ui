@@ -1,9 +1,13 @@
 import {Routes, Route} from 'react-router-dom'
-import Login_page from '../pages/Login_page'
+import { HomeP, LoginP, SignupP, ResetPwdP } from '../pages'
+
 export const ALlRoutes = () => {
   return (
     <Routes>
-        <Route path='/login' element={<Login_page/>}/>
+        <Route path='/' element={< HomeP/>}/>
+        <Route path='/login' element={<LoginP/>}/>
+        <Route path='/reset_password' element={<ResetPwdP/>}/>
+        <Route path='/signup' element={<SignupP/>}/>
     </Routes>
   )
 }
