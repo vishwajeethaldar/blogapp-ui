@@ -11,7 +11,7 @@ export const login = createAsyncThunk(
             const userInfo = await axios.post(`${config().baseurl}/api/session`, {
                 email:email, 
                 password:password
-            })
+            },{ withCredentials: true })
            
             return userInfo.data
         }catch(e:any){
@@ -21,16 +21,27 @@ export const login = createAsyncThunk(
     }    
 )
 
+export const getRefreshToken = createAsyncThunk(
+    "auth/getRefreshToken",
+    async(id, thunk)=>{
+       try{ 
+        // const resData = await axios.get(`${config().baseurl}/api/refresh`, {withCredentials:true}) 
+        const resd = await axios.get(`${config().baseurl}/api/refresh`,{ withCredentials: true })
+        return  resd.data
+       }catch(e:any){
+        return thunk.rejectWithValue(e.message)
+       }
+    }
+)
+
 export const logout = createAsyncThunk(
     "auth/logout",
-    async ({userId}:{userId:string}, thunk)=>{
+    async (id, thunk)=>{
         try{
-          const res =   await axios.patch(`${config().baseurl}/api/logout`,{
-            userId
-          })
-          console.log(res.data)
+          const res = await axios.delete(`${config().baseurl}/api/logout`,{ withCredentials: true })
           return res.data
         }catch(e:any){
+          
             return thunk.rejectWithValue(e.message)
         }
     }
@@ -51,7 +62,9 @@ const initialState:auth.authInterface = {
 export const AuthSlice = createSlice({
     name:"auth",
     initialState,
-    reducers:{},
+    reducers:{
+
+    },
     extraReducers(builder) {
         builder.addCase(login.pending, (state, action)=>{
             state.error = false,
@@ -62,6 +75,7 @@ export const AuthSlice = createSlice({
             state.loading = false
         })
         .addCase(login.fulfilled, (state, action:PayloadAction<any>)=>{
+            console.log(action.payload);
             
             state.error = false,
             state.loading = false,
@@ -90,6 +104,34 @@ export const AuthSlice = createSlice({
             state.sessExp = 0,
             state.isAuth = false,
             state.role = ""
+        })
+        .addCase(getRefreshToken.pending, (state, action)=>{
+            state.error = false,
+            state.loading = true     
+            
+        })
+        .addCase(getRefreshToken.rejected, (state, action:PayloadAction<any>)=>{
+            state.error = false,
+            state.loading = false,
+            state.userId = "",
+            state.sessIn =  0,
+            state.sessExp = 0,
+            state.isAuth = false,
+            state.role = ""
+           console.log(action)
+           
+        })
+
+        .addCase(getRefreshToken.fulfilled, (state, action:PayloadAction<any>)=>{
+            console.log(state, action.payload)
+            state.error = false,
+            state.loading = false,
+            state.userId = action.payload.decoded.userId,
+            state.sessIn =   action.payload.decoded.iat,
+            state.sessExp =  action.payload.decoded.exp,
+            state.isAuth = true,
+            state.role = ""
+            
         })
     }
 })

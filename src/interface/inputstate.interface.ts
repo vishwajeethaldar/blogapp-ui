@@ -25,13 +25,14 @@ export interface loginerror {
 
 
 export interface resetpwd {
-    email:string;
-    password:string;
-    otp:string;
+    email:string
+    password:string
+    otp:string
 }
 
 export interface resetemailerror {
     email:boolean;
+    errorMessage:string;
 }
 
 export interface optInput {
@@ -42,3 +43,11 @@ export interface optInput {
     five:string;
     six:string
 } 
+
+
+export interface validatePwd {
+    pwd1:string;
+    pwd2:string;
+   
+} 
+

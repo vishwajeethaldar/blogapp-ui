@@ -7,13 +7,18 @@ import {
 	FormLabel,
 	FormControl,
 	FormHelperText,
-	FormErrorMessage
+	FormErrorMessage,
+	Alert,
+	AlertIcon,
+	AlertTitle,
+	AlertDescription
   } from "@chakra-ui/react"
 import { Link } from "react-router-dom"
 import { inputstate } from "../../../interface"
-import React, {ChangeEvent, useState} from 'react'
+import React, {ChangeEvent, FormEvent, useEffect, useState} from 'react'
 import { config } from "../../../providers"
 import { useAppdispatch } from "../../../store/hooks/store.hook"
+import { createNewUser } from "../../../store/users/user.slice"
 const initialInput:inputstate.registerInput = {
 	name:"",
 	email:"",
@@ -27,13 +32,7 @@ const errors:inputstate.registererror = {
 }
 
 const Register = ()=>{
-
-	console.log(config().baseurl)
-	console.log(config().appbaseurl);
-
-
-	
-
+	const [successMsg, setSuccessMsg] = useState(false)
 	// state to manage track the input data in registartion form
 	const [input, setInput] =  useState<inputstate.registerInput>(initialInput)
 
@@ -56,19 +55,32 @@ const Register = ()=>{
 	
 		}
 	
-	const RegistrationProcess = ()=>{
-		
+	const RegistrationProcess = async(e:FormEvent<HTMLFormElement>)=>{
+			e.preventDefault()
+			let responce = await createNewUser(input)
+			setInput(initialInput)
+			setSuccessMsg(true)
 	}
+	useEffect(()=>{
+		return (
+			setSuccessMsg(false),
+			setInput(initialInput)
+		)
+	},[])
 		
 	return (
 		<Box w="100%" boxShadow={"lg"}  borderTop="1px solid #eee" py="40px" px="30px" borderRadius={"10px"} bg="#fff">
 			{/* COntainer Box */}
-
+			<form onSubmit={RegistrationProcess}>
 			<Text textAlign="center" fontSize={["6vw","6vw","4.2vw","2.5vw"]} fontWeight={"600"} pb="25px">
 				Sign up
 			</Text>
 			{/* Form Title */}
 	
+
+			<Box>
+				Continue with Github
+			</Box>
 				<Flex w="100%"  direction="column" gap="12px" justify="center">
 				
 				{/* Name input controller  */}
@@ -142,10 +154,15 @@ const Register = ()=>{
 							Already have account ? Click here to <Link to="/login"> <Box as="b" color="#668">Login </Box> </Link>
 						</Text>    
 					</Flex>
+					
+					{successMsg?<Alert status='success'>
+						<AlertIcon />
+						Account Verfication Link send to your Email Please Verify
+					</Alert>
+					:null}
 				</Flex>
-			
-
-    </Box>
+			</form>
+    	</Box>
 	)
 }
 

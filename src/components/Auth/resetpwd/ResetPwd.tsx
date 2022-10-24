@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useState } from 'react'
 import {
     Box, 
     Flex,
@@ -11,10 +11,13 @@ import {
     FormErrorMessage
 } from "@chakra-ui/react"
 import { inputstate } from '../../../interface'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { matchPwd, resetPassword, sendOtp } from '../../../utils'
+import { validatePwd } from '../../../interface/inputstate.interface'
 
 const error:inputstate.resetemailerror = {
-    email:false
+    email:false,
+    errorMessage:""
 }
 const intiState:inputstate.resetpwd = {
     email:"",
@@ -31,45 +34,88 @@ const optIntState:inputstate.optInput = {
     six:""
 }
 
+const validatePassword:validatePwd={
+    pwd1:"",
+    pwd2:''
+}
 
 const ResetPwd = () => {
     const navigate= useNavigate()
     const [input, setinput] =  useState(intiState)
+    const [diserror, setdisError] = useState("")
     const [switchResetForm, setSwitchResetForm] = useState(true)
     const [otpinput, setOtpInput]  = useState(optIntState)
     const [enablePwd, setEnablePwd] = useState(false)
+    const [matchpawwor, setMatchPwd]= useState(validatePassword)
+
 
     const handleInput = (e:ChangeEvent<HTMLInputElement>)=>{
         let {name, value}=  e.target as {name:string, value:string} ;
         setinput({...input, [name]:value})
         error.email = value===""
+        error.errorMessage = error.email?"Email is Required":""
+        setdisError(error.errorMessage)
     }
 
-    const sendEmail = ()=>{
-        setSwitchResetForm(!switchResetForm)
-    }
 
-    
     const handleOtp = (e:ChangeEvent<HTMLInputElement>)=>{
-            const {name,value} = e.target as {name:string, value:string};
-            console.log(name,value)
-           
-            setOtpInput({...otpinput, [name]:value})
+        const {name,value} = e.target as {name:string, value:string};
+      
+        setOtpInput({...otpinput, [name]:value})
 
-            if(otpinput.one && otpinput.two && otpinput.three && otpinput.four && otpinput.five){
-                if(name==="six" && value!==""){
-                    console.log("ehre")
-                    setEnablePwd(true)
-                }else{
-                    setEnablePwd(false)
-                }
+        if(otpinput.one && otpinput.two && otpinput.three && otpinput.four && otpinput.five){
+            if(name==="six" && value!==""){
+                console.log("ehre")
+                setEnablePwd(true)
             }else{
                 setEnablePwd(false)
             }
-    }
-    const updateNewPassword = ()=>{
-        const opt = otpinput.one+otpinput.two+otpinput.three+otpinput.four+otpinput.five+otpinput.six;
+        }else{
+            setEnablePwd(false)
+        }
+}
+
+const handlePwds = (e:ChangeEvent<HTMLInputElement>)=>{
+    const {name,value} = e.target as {name:string, value:string};
+    setMatchPwd({...matchpawwor, [name]:value})
  
+    if(name==="pwd2" && matchpawwor.pwd1!==value){
+       setdisError("Password does not matched")
+    }else{
+        setdisError("")
+        setinput({...input, password:matchpawwor.pwd1})
+    }
+}
+
+    const sendEmail = async(e:FormEvent<HTMLFormElement>)=>{
+       e.preventDefault()
+        let res =  await sendOtp(input.email)
+       
+       if(res?.status==="success"){
+        setSwitchResetForm(!switchResetForm)
+        return
+       }
+
+       error.email = res?.status!=="success"
+       error.errorMessage = error.email?"Email Not registered in our Database":""
+       setdisError(error.errorMessage)
+    }
+   
+
+    const updateNewPassword = async(e:FormEvent<HTMLFormElement>)=>{
+        e.preventDefault()
+        const finalotp = otpinput.one+otpinput.two+otpinput.three+otpinput.four+otpinput.five+otpinput.six;
+        
+           let res =  await resetPassword(input.email, input.password, finalotp)
+            
+
+           if(res.status==="success"){
+                setinput(intiState)
+                setOtpInput(optIntState)
+                return navigate("/login")
+           }            
+       
+              
     }
 
   return (
@@ -78,7 +124,7 @@ const ResetPwd = () => {
 
     {switchResetForm?
     // Display the below Component when user visits to reset passsword page 
-    <Box>
+    <form  onSubmit={(e)=>sendEmail(e)}>
     <Text textAlign="center" fontSize={["6vw","6vw","4.2vw","2.5vw"]} fontWeight={"600"} pb="25px">
         Reset password
     </Text>
@@ -89,20 +135,20 @@ const ResetPwd = () => {
                     </FormLabel>
                     
                     <Box w={"100%"}>
-                    <Input w="100%"  name="email" type={"text"} placeholder="Email" value={input.email} onChange={handleInput} required/>
+                    <Input w="100%"  name="email" type={"email"} placeholder="Email" value={input.email} onChange={handleInput} required/>
                         {!(error.email)? (
                         <FormHelperText>
                             
                         </FormHelperText>
                         ) : (
-                            <FormErrorMessage>Email is required.</FormErrorMessage>
+                            <FormErrorMessage>{diserror}</FormErrorMessage>
                         )}
                     </Box>
             </Flex>
 	    </FormControl>
 
         <Flex w="100%"  direction={"row"} justify="flex-start" align={"center"}>
-                <Button type="submit" w="50%" colorScheme={"telegram"} mb="10px" mt="10px" onClick={sendEmail}> Send  </Button>
+                <Button type="submit" w="50%" colorScheme={"telegram"} mb="10px" mt="10px" > Send  </Button>
         </Flex>
 
         <Flex w="100%"  direction={"row"}  align={"center"} gap="25px" pt="10px">
@@ -110,11 +156,11 @@ const ResetPwd = () => {
                 Go Back to  <Link to="/login"> <Box as="b" color="#668">Login </Box> </Link>
             </Text>    
         </Flex>
-    </Box>
+    </form>
 
 
 // Display below Component after sending the email 
-        :<Box>
+        :<form onSubmit={updateNewPassword}>
             <Text textAlign="center" fontSize={["6vw","6vw","4.2vw","2.5vw"]} fontWeight={"600"} pb="25px">
                     Create a New Password
             </Text>
@@ -126,12 +172,14 @@ const ResetPwd = () => {
                         </FormLabel>
                         
                         <Flex w={"80%"} gap="10px">
-                            <Input  value={otpinput.one} autoFocus={true} name="one" type={"text"} minLength={0} maxLength={1} onChange={handleOtp} required/>
-                            <Input  value={otpinput.two} name="two" type={"text"}  minLength={0} maxLength={1}  onChange={handleOtp} max={1} required/>
-                            <Input  value={otpinput.three} name="three" type={"text"}  minLength={0} maxLength={1} onChange={handleOtp} max="1"  required/>
-                            <Input  value={otpinput.four} name="four" type={"text"} minLength={0} maxLength={1}  onChange={handleOtp}  required/>
-                            <Input  value={otpinput.five} name="five" type={"text"}  minLength={0} maxLength={1}  onChange={handleOtp} max="1" required/>
-                            <Input  value={otpinput.six} name="six" type={"text"} minLength={0} maxLength={1}  onChange={handleOtp} max="1"  required/>
+                           
+                            <Input  id="one" value={otpinput.one} autoFocus={true} name="one" type={"text"} minLength={0} maxLength={1} onChange={handleOtp} required/>
+                            
+                            <Input  id="two" value={otpinput.two} name="two" type={"text"}  minLength={0} maxLength={1}  onChange={handleOtp} max={1} required/>
+                            <Input id="three"  value={otpinput.three} name="three" type={"text"}  minLength={0} maxLength={1} onChange={handleOtp} max="1"  required/>
+                            <Input  id="four" value={otpinput.four} name="four" type={"text"} minLength={0} maxLength={1}  onChange={handleOtp}  required/>
+                            <Input  id="five" value={otpinput.five} name="five" type={"text"}  minLength={0} maxLength={1}  onChange={handleOtp} max="1" required/>
+                            <Input  id="six" value={otpinput.six} name="six" type={"text"} minLength={0} maxLength={1}  onChange={handleOtp} max="1"  required/>
                         </Flex>
                 </Flex>
             </FormControl>
@@ -145,13 +193,13 @@ const ResetPwd = () => {
                         
                         <Box w={"100%"} >
                         
-                        <Input w="100%" bg={enablePwd?"#fff":"#ccc"}  name="password" type={"password"} placeholder="Type new password" disabled={!enablePwd} required/>
+                        <Input w="100%" bg={enablePwd?"#fff":"#ccc"}  onChange={handlePwds} value={matchpawwor.pwd1} name="pwd1" type={"password"} placeholder="Type new password" disabled={!enablePwd} required/>
                             {!(false)? (
                             <FormHelperText>
                                 
                             </FormHelperText>
                             ) : (
-                                <FormErrorMessage>Email is required.</FormErrorMessage>
+                                <FormErrorMessage></FormErrorMessage>
                             )}
                         </Box>
                 </Flex>
@@ -164,7 +212,8 @@ const ResetPwd = () => {
                         </FormLabel>
                         
                         <Box w={"100%"}>
-                        <Input w="100%"  bg={enablePwd?"#fff":"#ccc"}  name="password" type={"password"} placeholder="Confirm new password" disabled={!enablePwd} required/>
+                        
+                        <Input w="100%"  bg={enablePwd?"#fff":"#ccc"} onChange={handlePwds} value={matchpawwor.pwd2} name="pwd2" type={"password"} placeholder="Confirm new password" disabled={!enablePwd} required/>
                             {!(false)? (
                             <FormHelperText>
                                 
@@ -178,9 +227,9 @@ const ResetPwd = () => {
             
 
             <Flex w="100%"  direction={"row"} justify="flex-start" align={"center"}>
-                    <Button type="submit" w="40%" colorScheme={"telegram"} mb="10px" mt="10px" onClick={updateNewPassword}> Submit  </Button>
+                    <Button type="submit" w="40%" colorScheme={"telegram"} mb="10px" mt="10px" > Submit  </Button>
             </Flex>
-
+            <Text align={"center"}>{diserror}</Text>                    
             <Flex w="100%"  direction={"row"}  align={"center"} gap="25px" pt="10px">
             <Text fontSize={"18px"}>
                    <Box as="b" color="#668" onClick={()=>setSwitchResetForm(!switchResetForm)} _hover={{cursor:"pointer"}}>   Go Back  </Box> 
@@ -189,7 +238,7 @@ const ResetPwd = () => {
                     Go Back to  <Link to="/login"> <Box as="b" color="#668">Login </Box> </Link>
                 </Text>    
             </Flex>
-        </Box>
+        </form>
      }
 
     </Box>

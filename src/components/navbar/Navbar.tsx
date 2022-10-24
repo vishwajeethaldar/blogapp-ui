@@ -6,7 +6,7 @@ type Props = {}
 
 const Navbar = (props: Props) => {
   return (
-    <Box w={"100%"} boxShadow={"sm"} py="10px" px="15px" > 
+    <Box w={"100%"} boxShadow={"sm"} py="10px" px="15px" bg={"#2a5298"} > 
         <Flex w="100%" justifyContent={"space-between"} align={"center"}> 
             <Box>
                 <BrandDisplay />
@@ -16,7 +16,7 @@ const Navbar = (props: Props) => {
                 
             </Box>
 
-            <Box>
+            <Box >
               <UserTag/>
             </Box>
         </Flex>

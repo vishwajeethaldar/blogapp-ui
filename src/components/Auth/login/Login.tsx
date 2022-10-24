@@ -1,5 +1,5 @@
 import React,{useState, ChangeEvent, FormEvent, useEffect} from 'react'
-import axios from "axios"
+
 import {
     Box, 
     Flex,
@@ -12,7 +12,7 @@ import {
     FormHelperText,
     FormErrorMessage
 } from "@chakra-ui/react"
-import {Form, Link, useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { inputstate } from '../../../interface';
 import { useAppdispatch, useAppSelector } from "../../../store/hooks/store.hook"
 import { login } from '../../../store/Auth.store/Auth.Slice';
@@ -68,12 +68,11 @@ const handleInput = (e:ChangeEvent<HTMLInputElement>)=>{
        
 }
 
-
-	useEffect(()=>{
-		if(auth.isAuth){
-			return navigte("/")
-		}
-	})
+useEffect(()=>{
+	if(auth.isAuth){
+		return navigte("/")
+	}
+})
 
   return (
 	!(auth.isAuth)?
@@ -143,8 +142,8 @@ const handleInput = (e:ChangeEvent<HTMLInputElement>)=>{
 					</Flex>
 				</Flex>
     </form>
-	</Box>:
-	null
+	</Box>:null
+	
   )
 }
 
