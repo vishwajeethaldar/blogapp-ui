@@ -23,10 +23,10 @@ export const createNewUser = async(user:{name:string, email:string, password:str
         email:user.email,
         password:user.password
     })
-
 }
 
-const initialState:userState = {
+
+export const initialState:userState = {
     name:"",
     email:"",
     avatar:"",
@@ -41,7 +41,18 @@ const initialState:userState = {
 const userSlice = createSlice({
     name:"userSlice",
     initialState,
-    reducers:{},
+    reducers:{
+        removeUser:(state)=>{
+            state.name="",
+            state.email="",
+            state.avatar="",
+            state.userId="",
+            state.role="",
+            state.loading=false,
+            state.error=false,
+            state.errorMsg=""
+        }
+    },
     extraReducers(builder) {
         builder.addCase(getUserInfo.pending,(state, action)=>{
             state.loading = true,
@@ -64,5 +75,5 @@ const userSlice = createSlice({
     },
 })
 
-
+export const removeUser = userSlice.actions
 export default userSlice.reducer

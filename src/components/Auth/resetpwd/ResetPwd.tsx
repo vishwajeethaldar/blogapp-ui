@@ -119,13 +119,13 @@ const handlePwds = (e:ChangeEvent<HTMLInputElement>)=>{
     }
 
   return (
-    <Box w="100%" boxShadow={"lg"} borderTop="1px solid #eee" py="40px" px="30px" borderRadius={"10px"} bg="#fff">
+    <Box w="100%" boxShadow={"lg"} borderTop="1px solid #eee" py="15px" px="30px" borderRadius={"5px"} bg="#fff">
     {/* COntainer Box */}
 
     {switchResetForm?
     // Display the below Component when user visits to reset passsword page 
     <form  onSubmit={(e)=>sendEmail(e)}>
-    <Text textAlign="center" fontSize={["6vw","6vw","4.2vw","2.5vw"]} fontWeight={"600"} pb="25px">
+    <Text textAlign="center" fontSize={["6vw","6vw","4.2vw","1.8vw"]} fontWeight={"600"} pb="10px">
         Reset password
     </Text>
          <FormControl isInvalid={error.email}>
@@ -148,11 +148,11 @@ const handlePwds = (e:ChangeEvent<HTMLInputElement>)=>{
 	    </FormControl>
 
         <Flex w="100%"  direction={"row"} justify="flex-start" align={"center"}>
-                <Button type="submit" w="50%" colorScheme={"telegram"} mb="10px" mt="10px" > Send  </Button>
+                <Button type="submit" w="120px" colorScheme={"telegram"} mb="10px" mt="10px" > Send  </Button>
         </Flex>
 
         <Flex w="100%"  direction={"row"}  align={"center"} gap="25px" pt="10px">
-            <Text fontSize={"18px"}>
+            <Text fontSize={"14px"}>
                 Go Back to  <Link to="/login"> <Box as="b" color="#668">Login </Box> </Link>
             </Text>    
         </Flex>
@@ -231,10 +231,10 @@ const handlePwds = (e:ChangeEvent<HTMLInputElement>)=>{
             </Flex>
             <Text align={"center"}>{diserror}</Text>                    
             <Flex w="100%"  direction={"row"}  align={"center"} gap="25px" pt="10px">
-            <Text fontSize={"18px"}>
+            <Text fontSize={"14px"}>
                    <Box as="b" color="#668" onClick={()=>setSwitchResetForm(!switchResetForm)} _hover={{cursor:"pointer"}}>   Go Back  </Box> 
                 </Text> 
-                <Text fontSize={"18px"}>
+                <Text fontSize={"14px"}>
                     Go Back to  <Link to="/login"> <Box as="b" color="#668">Login </Box> </Link>
                 </Text>    
             </Flex>

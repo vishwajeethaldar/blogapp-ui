@@ -3,18 +3,20 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { logout } from '../../store/Auth.store/Auth.Slice'
 import { useAppdispatch, useAppSelector } from '../../store/hooks/store.hook'
+import {removeUser} from '../../store/users/user.slice'
 
-export const UserMenu = () => {
+export const UserMenu = ({role}:{role:string}) => {
     const dispatch = useAppdispatch()
     const auth= useAppSelector(store=>store.AuthSlice)
     const user = useAppSelector(store=>store.userSlice)
+      
+const handleLogout =  ()=>{
+       dispatch(removeUser.removeUser())
+       dispatch(logout())
+}
 
-    const handleLogout =  ()=>{
-         dispatch(logout())
-    }
-
-  return (
-    user?.role==="admin"?
+return (
+    role==="admin"?
         <Box>
         <Flex direction={"column"}>
             <Link to="/user-profile"> 
@@ -33,7 +35,8 @@ export const UserMenu = () => {
                 </Text>
         </Flex>
     </Box>
-    :<Box>
+    :role==="user"?
+    <Box>
    <Flex direction={"column"}>
             <Link to="/user-profile"> 
                 <Text>
@@ -46,6 +49,7 @@ export const UserMenu = () => {
                 </Text>
         </Flex>
     </Box>
-  
+    :
+    null
   )
 }

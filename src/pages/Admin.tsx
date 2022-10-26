@@ -1,15 +1,15 @@
-import { Box } from '@chakra-ui/react'
-import React from 'react'
+import { Box, Flex } from '@chakra-ui/react'
+import React, { useState } from 'react'
 import { Navbar } from '../components'
+import { Menus } from '../components/Admin/Menus'
 import { useAppSelector } from '../store/hooks/store.hook'
 
  const Admin = () => {
-  const userInfo =  useAppSelector(store=>store.userSlice)
-  console.log(userInfo);
-  
+  const [isVisible, setIsVisible] =  useState(false)
   return (
-    <Box bg="green">
-        <Navbar/>
+    <Box>
+        <Navbar setIsVisible={setIsVisible} isVisible={isVisible}/>
+        <Menus isVisible={isVisible}/>
     </Box>
   )
 }

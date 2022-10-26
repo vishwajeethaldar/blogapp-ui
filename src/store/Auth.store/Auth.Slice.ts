@@ -6,7 +6,7 @@ import { auth } from "../../interface";
 export const login = createAsyncThunk(
     "auth/login",
     async({email, password}:{email:string, password:string}, thunk)=>{
-        
+        console.log(email, password)
         try{
             const userInfo = await axios.post(`${config().baseurl}/api/session`, {
                 email:email, 
@@ -96,7 +96,6 @@ export const AuthSlice = createSlice({
             state.loading = false
         })
         .addCase(logout.fulfilled, (state, action:PayloadAction<any>)=>{
-            
             state.error = false,
             state.loading = false,
             state.userId = "",
