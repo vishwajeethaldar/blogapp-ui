@@ -1,2 +1,5 @@
 export  * as inputstate from './inputstate.interface'
 export * as auth from './auth.intrerface'
+export * as categoryint from './category.interface'
+export * as bloginterface from './blog.interface'
+export * as commentInterface from './comment.interface'
